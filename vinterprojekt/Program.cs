@@ -3,32 +3,58 @@ using System.Collections.Generic;
 using Raylib_cs;
 using System.Numerics;
 
-static void main()
+
+float speed = 4.3f;
+bool alive = false;
+
+Vector2 playerMovement = new Vector2();
+
+//Vector2 textPos = new Vector2(380, 320);
+//Font cartoon = Raylib.LoadFont("MOOCHIO.ttf");
+
+
+Raylib.InitWindow(1000, 1000, "Vinterprojekt");
+Raylib.SetTargetFPS(60);
+
+Rectangle playerRect = new Rectangle(50, 661, 88, 100);
+Rectangle box = new Rectangle(500, 400, 80, 80);
+
+bool collision = false;
+Rectangle overlap = Raylib.GetCollisionRec(playerRect, box);
+Texture2D playerImage = Raylib.LoadTexture("yes.png");
+Texture2D start = Raylib.LoadTexture("start.png");
+
+
+
+while (!Raylib.WindowShouldClose())
 {
-
-    float speed = 4.3f;
-
-    Vector2 playerMovement = new Vector2();
-
-
-    Raylib.InitWindow(1000, 1000, "Vinterprojekt");
-    Raylib.SetTargetFPS(60);
-
-    Rectangle playerRect = new Rectangle(50, 661, 88, 100);
-    Rectangle box = new Rectangle(500, 400, 80, 80);
-
-    bool collision = false;
-    Rectangle overlap = Raylib.GetCollisionRec(playerRect, box);
-    Texture2D playerImage = Raylib.LoadTexture("yes.png");
-
-
-
-
-
-
-    while (!Raylib.WindowShouldClose())
+    if (alive == false)
     {
+        Raylib.BeginDrawing();
+
+        Raylib.ClearBackground(Color.WHITE);
+        Raylib.DrawTexture(start, 0, 0, Color.WHITE);
+
+        //Raylib.DrawTextEx(cartoon, "Winterproject", textPos, 60, 0, Color.ORANGE);
+        Raylib.DrawText("Vinterprojekt", 280, 300, 60, Color.ORANGE);
+
+
+        //Raylib.DrawRectangle(420, 498, 125, 30, Color.BEIGE);
+        Raylib.DrawText("START", 430, 500, 30, Color.WHITE);
+
+        if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON))
+        {
+            if (Raylib.GetMouseX() >= 420 & Raylib.GetMouseX() <= 545 & Raylib.GetMouseY() >= 498 & Raylib.GetMouseY() <= 528) alive = true;
+        }
+
+
+        Raylib.EndDrawing();
+    }
+    else
+    {
+
         playerMovement = PlayerMovement(speed);
+
         playerRect.y += playerMovement.Y;
         playerRect.x += playerMovement.X;
 
@@ -42,12 +68,9 @@ static void main()
             playerRect.x -= playerMovement.X;
         }
 
-        PlayerCollision(playerRect, collision, box, overlap);
-        PlayerShooting();
-        LevelDesign();
-
-        Console.WriteLine("y = " + playerRect.y);
-        Console.WriteLine("x = " + playerRect.x);
+        Collision.PlayerCollision(playerRect, collision, box, overlap);
+        Bullet.PlayerShooting();
+        Levels.LevelDesign();
 
         Raylib.BeginDrawing();
 
@@ -59,81 +82,9 @@ static void main()
         Raylib.DrawRectangleRec(overlap, Color.ORANGE);
 
         Raylib.EndDrawing();
-
     }
 }
 
-static void PlayerCollision(Rectangle playerRect, bool collision, Rectangle box, Rectangle overlap)
-{
-
-    if ((playerRect.x + playerRect.width) >= Raylib.GetScreenWidth())
-    {
-        playerRect.x = Raylib.GetScreenWidth() - playerRect.width;
-    }
-    else if (playerRect.x <= 0)
-    {
-        playerRect.x = 0;
-    }
-
-    if ((playerRect.y + playerRect.height) >= Raylib.GetScreenHeight())
-    {
-        playerRect.y = Raylib.GetScreenHeight() - playerRect.height;
-    }
-    else if (playerRect.y <= 0)
-    {
-        playerRect.y = 0;
-    }
-
-
-    collision = Raylib.CheckCollisionRecs(playerRect, box);
-
-    if (collision)
-    {
-        overlap = Raylib.GetCollisionRec(playerRect, box);
-    }
-}
-
-
-static void PlayerShooting()
-{
-
-    Rectangle bullet = new Rectangle(20, 20, 15, 45);
-    Texture2D bulletImage = Raylib.LoadTexture("bullet.png");
-
-    if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_LEFT_BUTTON))
-    {
-        //Raylib.DrawRectangleRec(bullet, Color.WHITE);
-        Raylib.DrawTexture(bulletImage, (int)bullet.x, (int)bullet.y, Color.WHITE);
-    }
-
-}
-
-static void LevelDesign()
-{
-
-    int[,] level = {
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1},
-        {1,0,0,0,0,0,1,1,1,1,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        };
-
-    for (int y = 0; y < level.GetLength(1); y++)
-    {
-        for (int x = 0; x < level.GetLength(0); x++)
-        {
-            level[x, y] = 0;
-        }
-
-    }
-
-}
 
 static Vector2 PlayerMovement(float speed)
 {
@@ -146,5 +97,3 @@ static Vector2 PlayerMovement(float speed)
     return movement;
 }
 
-
-main();
