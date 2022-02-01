@@ -12,23 +12,26 @@ Vector2 playerMovement = new Vector2();
 //Vector2 textPos = new Vector2(380, 320);
 //Font cartoon = Raylib.LoadFont("MOOCHIO.ttf");
 
-
 Raylib.InitWindow(1000, 1000, "Vinterprojekt");
 Raylib.SetTargetFPS(60);
 
 Rectangle playerRect = new Rectangle(50, 661, 88, 100);
 Rectangle box = new Rectangle(500, 400, 80, 80);
 
+List<Rectangle> enemyRect = new List<Rectangle>();
+List<float> enemySpeed = new List<float>();
+Random generator = new Random();
+
 bool collision = false;
 Rectangle overlap = Raylib.GetCollisionRec(playerRect, box);
 Texture2D playerImage = Raylib.LoadTexture("yes.png");
 Texture2D start = Raylib.LoadTexture("start.png");
 
-
+List<Rectangle> map = Levels.LevelDesign();
 
 while (!Raylib.WindowShouldClose())
 {
-    if (alive == false)
+    if (!alive)
     {
         Raylib.BeginDrawing();
 
@@ -38,7 +41,6 @@ while (!Raylib.WindowShouldClose())
         //Raylib.DrawTextEx(cartoon, "Winterproject", textPos, 60, 0, Color.ORANGE);
         Raylib.DrawText("Vinterprojekt", 280, 300, 60, Color.ORANGE);
 
-
         //Raylib.DrawRectangle(420, 498, 125, 30, Color.BEIGE);
         Raylib.DrawText("START", 430, 500, 30, Color.WHITE);
 
@@ -47,30 +49,22 @@ while (!Raylib.WindowShouldClose())
             if (Raylib.GetMouseX() >= 420 & Raylib.GetMouseX() <= 545 & Raylib.GetMouseY() >= 498 & Raylib.GetMouseY() <= 528) alive = true;
         }
 
-
         Raylib.EndDrawing();
     }
     else
     {
-
         playerMovement = PlayerMovement(speed);
 
         playerRect.y += playerMovement.Y;
         playerRect.x += playerMovement.X;
 
-        if (Raylib.CheckCollisionRecs(playerRect, box))
-        {
-            playerRect.y -= playerMovement.Y;
-        }
+        if (Raylib.CheckCollisionRecs(playerRect, box)) playerRect.y -= playerMovement.Y;
 
-        if (Raylib.CheckCollisionRecs(playerRect, box))
-        {
-            playerRect.x -= playerMovement.X;
-        }
+        if (Raylib.CheckCollisionRecs(playerRect, box)) playerRect.x -= playerMovement.X;
+
 
         Collision.PlayerCollision(playerRect, collision, box, overlap);
-        Bullet.PlayerShooting();
-        Levels.LevelDesign();
+        Bullet.PlayerShooting(playerRect);
 
         Raylib.BeginDrawing();
 
@@ -81,10 +75,14 @@ while (!Raylib.WindowShouldClose())
         Raylib.DrawRectangleRec(box, Color.WHITE);
         Raylib.DrawRectangleRec(overlap, Color.ORANGE);
 
+        foreach (Rectangle block in map)
+        {
+            Raylib.DrawRectangleRec(block, Color.GREEN);
+        }
+
         Raylib.EndDrawing();
     }
 }
-
 
 static Vector2 PlayerMovement(float speed)
 {
@@ -96,4 +94,3 @@ static Vector2 PlayerMovement(float speed)
 
     return movement;
 }
-

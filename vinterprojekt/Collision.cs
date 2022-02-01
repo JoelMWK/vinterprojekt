@@ -8,7 +8,6 @@ public class Collision
     public static void PlayerCollision(Rectangle playerRect, bool collision, Rectangle box, Rectangle overlap)
     {
 
-
         if ((playerRect.x + playerRect.width) >= Raylib.GetScreenWidth())
         {
             playerRect.x = Raylib.GetScreenWidth() - playerRect.width;
