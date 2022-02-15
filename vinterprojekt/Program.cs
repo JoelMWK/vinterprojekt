@@ -6,28 +6,28 @@ using System.Numerics;
 
 float speed = 4.3f;
 bool alive = false;
+bool taken = false;
+int points = 0;
+string room = "start";
 
-Vector2 playerMovement = new Vector2();
-
-//Vector2 textPos = new Vector2(380, 320);
-//Font cartoon = Raylib.LoadFont("MOOCHIO.ttf");
 
 Raylib.InitWindow(1000, 1000, "Vinterprojekt");
 Raylib.SetTargetFPS(60);
 
-Rectangle playerRect = new Rectangle(50, 661, 88, 100);
-Rectangle box = new Rectangle(500, 400, 80, 80);
+Vector2 playerMovement = new Vector2();
+Rectangle playerRect = new Rectangle(0, 1000 - 68, 60, 68);
 
-List<Rectangle> enemyRect = new List<Rectangle>();
-List<float> enemySpeed = new List<float>();
-Random generator = new Random();
-
-bool collision = false;
-Rectangle overlap = Raylib.GetCollisionRec(playerRect, box);
 Texture2D playerImage = Raylib.LoadTexture("yes.png");
 Texture2D start = Raylib.LoadTexture("start.png");
+Texture2D coinTexture = Raylib.LoadTexture("coin.png");
+Texture2D doorTexture = Raylib.LoadTexture("door.png");
+Texture2D wallTexture = Raylib.LoadTexture("wall.png");
 
-List<Rectangle> map = Levels.LevelDesign();
+List<Rectangle> door = new List<Rectangle>();
+List<Rectangle> point = new List<Rectangle>();
+List<Rectangle> map = Levels.LevelDesign(points, door, point);
+
+
 
 while (!Raylib.WindowShouldClose())
 {
@@ -38,49 +38,70 @@ while (!Raylib.WindowShouldClose())
         Raylib.ClearBackground(Color.WHITE);
         Raylib.DrawTexture(start, 0, 0, Color.WHITE);
 
-        //Raylib.DrawTextEx(cartoon, "Winterproject", textPos, 60, 0, Color.ORANGE);
         Raylib.DrawText("Vinterprojekt", 280, 300, 60, Color.ORANGE);
-
-        //Raylib.DrawRectangle(420, 498, 125, 30, Color.BEIGE);
         Raylib.DrawText("START", 430, 500, 30, Color.WHITE);
+
+        Raylib.EndDrawing();
 
         if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_LEFT_BUTTON))
         {
-            if (Raylib.GetMouseX() >= 420 & Raylib.GetMouseX() <= 545 & Raylib.GetMouseY() >= 498 & Raylib.GetMouseY() <= 528) alive = true;
+            int mX = Raylib.GetMouseX();
+            int mY = Raylib.GetMouseY();
+            if (mX >= 420 & mX <= 545 & mY >= 498 & mY <= 528) alive = true;
         }
-
-        Raylib.EndDrawing();
     }
     else
     {
-        playerMovement = PlayerMovement(speed);
-
-        playerRect.y += playerMovement.Y;
-        playerRect.x += playerMovement.X;
-
-        if (Raylib.CheckCollisionRecs(playerRect, box)) playerRect.y -= playerMovement.Y;
-
-        if (Raylib.CheckCollisionRecs(playerRect, box)) playerRect.x -= playerMovement.X;
-
-
-        Collision.PlayerCollision(playerRect, collision, box, overlap);
-        Bullet.PlayerShooting(playerRect);
-
         Raylib.BeginDrawing();
 
         Raylib.ClearBackground(Color.SKYBLUE);
 
-        //Raylib.DrawRectangleRec(playerRect, Color.WHITE);
         Raylib.DrawTexture(playerImage, (int)playerRect.x, (int)playerRect.y, Color.WHITE);
-        Raylib.DrawRectangleRec(box, Color.WHITE);
-        Raylib.DrawRectangleRec(overlap, Color.ORANGE);
-
-        foreach (Rectangle block in map)
-        {
-            Raylib.DrawRectangleRec(block, Color.GREEN);
-        }
+        Raylib.DrawText("Points: " + points, 900, 30, 20, Color.BLACK);
 
         Raylib.EndDrawing();
+
+        if (room == "start" || room == "hallway")
+        {
+            CountDown.timer();
+
+            playerRect = Collision.PlayerCollision(playerRect);
+            playerMovement = PlayerMovement(speed);
+
+            playerRect.y += playerMovement.Y;
+            playerRect.x += playerMovement.X;
+        }
+
+        if (room == "start")
+        {
+            foreach (Rectangle pointRect in point)
+            {
+                Raylib.DrawTexture(coinTexture, (int)pointRect.x, (int)pointRect.y, Color.WHITE);
+                if (Raylib.CheckCollisionRecs(playerRect, pointRect) && taken == false) { points++; taken = true;}
+                if (taken == true)
+                {
+                    point.RemoveAt(1);
+                }
+            }
+            foreach (Rectangle doorRect in door)
+            {
+                Raylib.DrawTexture(doorTexture, (int)doorRect.x, (int)doorRect.y, Color.WHITE);
+                if (Raylib.CheckCollisionRecs(playerRect, doorRect)) room = "hallway";
+
+            }
+            foreach (Rectangle box in map)
+            {
+                Raylib.DrawTexture(wallTexture, (int)box.x, (int)box.y, Color.WHITE);
+                if (Raylib.CheckCollisionRecs(playerRect, box)) playerRect.y -= playerMovement.Y;
+                if (Raylib.CheckCollisionRecs(playerRect, box)) playerRect.x -= playerMovement.X;
+            }
+        }
+        else if (room == "hallway")
+        {
+            Raylib.ClearBackground(Color.BEIGE);
+            Raylib.DrawTexture(playerImage, (int)playerRect.x, (int)playerRect.y, Color.WHITE);
+        }
+
     }
 }
 
