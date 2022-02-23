@@ -76,11 +76,10 @@ while (!Raylib.WindowShouldClose())
         {
             foreach (Rectangle pointRect in point)
             {
-                Raylib.DrawTexture(coinTexture, (int)pointRect.x, (int)pointRect.y, Color.WHITE);
-                if (Raylib.CheckCollisionRecs(playerRect, pointRect) && taken == false) { points++; taken = true;}
-                if (taken == true)
+                if (Raylib.CheckCollisionRecs(playerRect, pointRect) && taken == false) { points++; taken = true; }
+                if (taken == false)
                 {
-                    point.RemoveAt(1);
+                    Raylib.DrawTexture(coinTexture, (int)pointRect.x, (int)pointRect.y, Color.WHITE);
                 }
             }
             foreach (Rectangle doorRect in door)
@@ -107,7 +106,7 @@ while (!Raylib.WindowShouldClose())
 
 static Vector2 PlayerMovement(float speed)
 {
-    Vector2 movement = Vector2.Zero;
+    Vector2 movement = new Vector2();
     if (Raylib.IsKeyDown(KeyboardKey.KEY_W)) movement.Y = -speed;
     if (Raylib.IsKeyDown(KeyboardKey.KEY_S)) movement.Y = +speed;
     if (Raylib.IsKeyDown(KeyboardKey.KEY_D)) movement.X += speed;

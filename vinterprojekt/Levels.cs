@@ -25,15 +25,13 @@ public class Levels
             {0,1,1,0,0,1,0,0,3,0,1,2},
         };
 
-
         int size = 84;
         int sizeCoin = 30;
 
-        if (points == 3)
+        if (points >= 3)
         {
             level[8, 11] = 0;
         }
-
         for (int y = 0; y < level.GetLength(1); y++)
         {
             for (int x = 0; x < level.GetLength(0); x++)
@@ -55,7 +53,6 @@ public class Levels
         }
 
         return map;
-
     }
 
 }
