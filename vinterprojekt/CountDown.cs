@@ -15,8 +15,6 @@ public class CountDown
         countDown.Interval = 1000;
 
         countDown.Enabled = true;
-
-        Console.WriteLine();
     }
 
 }

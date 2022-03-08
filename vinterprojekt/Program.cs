@@ -6,7 +6,7 @@ using System.Numerics;
 
 float speed = 4.3f;
 bool alive = false;
-bool taken = false;
+bool keyTaken = false;
 int points = 0;
 string room = "start";
 
@@ -15,17 +15,17 @@ Raylib.InitWindow(1000, 1000, "Vinterprojekt");
 Raylib.SetTargetFPS(60);
 
 Vector2 playerMovement = new Vector2();
-Rectangle playerRect = new Rectangle(0, 1000 - 68, 60, 68);
+Rectangle playerRect = new Rectangle(0, 1000 - 60, 53, 60);
 
 Texture2D playerImage = Raylib.LoadTexture("yes.png");
 Texture2D start = Raylib.LoadTexture("start.png");
-Texture2D coinTexture = Raylib.LoadTexture("coin.png");
+Texture2D keyTexture = Raylib.LoadTexture("key.png");
 Texture2D doorTexture = Raylib.LoadTexture("door.png");
 Texture2D wallTexture = Raylib.LoadTexture("wall.png");
 
 List<Rectangle> door = new List<Rectangle>();
-List<Rectangle> point = new List<Rectangle>();
-List<Rectangle> map = Levels.LevelDesign(points, door, point);
+List<Rectangle> key = new List<Rectangle>();
+List<Rectangle> map = Levels.LevelDesign(door, key);
 
 
 
@@ -57,14 +57,12 @@ while (!Raylib.WindowShouldClose())
         Raylib.ClearBackground(Color.SKYBLUE);
 
         Raylib.DrawTexture(playerImage, (int)playerRect.x, (int)playerRect.y, Color.WHITE);
-        Raylib.DrawText("Points: " + points, 900, 30, 20, Color.BLACK);
 
         Raylib.EndDrawing();
 
         if (room == "start" || room == "hallway")
         {
             CountDown.timer();
-
             playerRect = Collision.PlayerCollision(playerRect);
             playerMovement = PlayerMovement(speed);
 
@@ -74,12 +72,12 @@ while (!Raylib.WindowShouldClose())
 
         if (room == "start")
         {
-            foreach (Rectangle pointRect in point)
+            foreach (Rectangle keyRect in key)
             {
-                if (Raylib.CheckCollisionRecs(playerRect, pointRect) && taken == false) { points++; taken = true; }
-                if (taken == false)
+                if (Raylib.CheckCollisionRecs(playerRect, keyRect) && keyTaken == false) { points++; keyTaken = true; }
+                if (!keyTaken)
                 {
-                    Raylib.DrawTexture(coinTexture, (int)pointRect.x, (int)pointRect.y, Color.WHITE);
+                    Raylib.DrawTexture(keyTexture, (int)keyRect.x, (int)keyRect.y, Color.WHITE);
                 }
             }
             foreach (Rectangle doorRect in door)
@@ -101,6 +99,7 @@ while (!Raylib.WindowShouldClose())
             Raylib.DrawTexture(playerImage, (int)playerRect.x, (int)playerRect.y, Color.WHITE);
         }
 
+        Levels.checkKey(keyTaken, Levels.level);
     }
 }
 
