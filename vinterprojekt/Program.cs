@@ -7,26 +7,28 @@ using System.Numerics;
 float speed = 4.3f;
 bool alive = false;
 bool keyTaken = false;
-int points = 0;
 string room = "start";
-
+int hp = 100;
 
 Raylib.InitWindow(1000, 1000, "Vinterprojekt");
 Raylib.SetTargetFPS(60);
 
+//Gör en vector för playermovement
 Vector2 playerMovement = new Vector2();
+//Skapar en rectangle som ska vara för gubben
 Rectangle playerRect = new Rectangle(0, 1000 - 60, 53, 60);
 
+//Skapar textur variablar
 Texture2D playerImage = Raylib.LoadTexture("yes.png");
 Texture2D start = Raylib.LoadTexture("start.png");
 Texture2D keyTexture = Raylib.LoadTexture("key.png");
 Texture2D doorTexture = Raylib.LoadTexture("door.png");
 Texture2D wallTexture = Raylib.LoadTexture("wall.png");
 
+//Skapar listor för objekt i spelet
 List<Rectangle> door = new List<Rectangle>();
 List<Rectangle> key = new List<Rectangle>();
-List<Rectangle> map = Levels.LevelDesign(door, key);
-
+List<Rectangle> map = Levels.LevelDesign(door, key); 
 
 
 while (!Raylib.WindowShouldClose())
@@ -52,29 +54,30 @@ while (!Raylib.WindowShouldClose())
     }
     else
     {
+
         Raylib.BeginDrawing();
 
         Raylib.ClearBackground(Color.SKYBLUE);
 
+        //Ritar ut texturen playerImage med positionen av playerRect.x och playerRect.y som checkas i metoden "PlayerMovement"
         Raylib.DrawTexture(playerImage, (int)playerRect.x, (int)playerRect.y, Color.WHITE);
 
         Raylib.EndDrawing();
 
         if (room == "start" || room == "hallway")
         {
-            CountDown.timer();
             playerRect = Collision.PlayerCollision(playerRect);
             playerMovement = PlayerMovement(speed);
-
+    
             playerRect.y += playerMovement.Y;
             playerRect.x += playerMovement.X;
-        }
 
+        }
         if (room == "start")
         {
             foreach (Rectangle keyRect in key)
             {
-                if (Raylib.CheckCollisionRecs(playerRect, keyRect) && keyTaken == false) { points++; keyTaken = true; }
+                if (Raylib.CheckCollisionRecs(playerRect, keyRect) && keyTaken == false) keyTaken = true;
                 if (!keyTaken)
                 {
                     Raylib.DrawTexture(keyTexture, (int)keyRect.x, (int)keyRect.y, Color.WHITE);
@@ -89,17 +92,31 @@ while (!Raylib.WindowShouldClose())
             foreach (Rectangle box in map)
             {
                 Raylib.DrawTexture(wallTexture, (int)box.x, (int)box.y, Color.WHITE);
-                if (Raylib.CheckCollisionRecs(playerRect, box)) playerRect.y -= playerMovement.Y;
-                if (Raylib.CheckCollisionRecs(playerRect, box)) playerRect.x -= playerMovement.X;
+                if (Raylib.CheckCollisionRecs(playerRect, box)) { playerRect.y -= playerMovement.Y; hp -= 2; }
+                if (Raylib.CheckCollisionRecs(playerRect, box)) { playerRect.x -= playerMovement.X; hp -= 2; }
             }
+            Raylib.DrawText("Health: " + hp, 40, 20, 30, Color.WHITE);
         }
         else if (room == "hallway")
         {
-            Raylib.ClearBackground(Color.BEIGE);
+            Raylib.DrawText("To be continued!", 260, 400, 70, Color.WHITE);
             Raylib.DrawTexture(playerImage, (int)playerRect.x, (int)playerRect.y, Color.WHITE);
+
+            playerRect.y = 400;
+            playerRect.x = 200;
         }
 
         Levels.checkKey(keyTaken, Levels.level);
+        map = Levels.LevelDesign(door, key, false);
+
+        if (hp <= 0)
+        {
+            room = "death";
+            if (room == "death")
+            {
+                Raylib.DrawText("YOU DIED!", 300, 400, 50, Color.RED);
+            }
+        }
     }
 }
 

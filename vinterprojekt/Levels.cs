@@ -5,7 +5,6 @@ using System.Numerics;
 
 public class Levels
 {
-
     static public int[,] level = new int[12, 12]{
             {0,1,0,1,0,0,0,0,0,1,0,1},
             {0,0,0,0,0,1,1,1,0,0,0,1},
@@ -17,12 +16,10 @@ public class Levels
             {0,1,1,0,1,1,0,1,0,1,0,0},
             {0,0,0,0,0,1,0,1,0,1,1,1},
             {1,0,0,1,1,1,0,1,0,0,0,0},
-            {0,0,0,0,0,1,0,1,1,1,1,0},
-            {0,1,1,0,0,1,0,0,0,0,1,2},
+            {2,0,0,0,0,1,0,1,1,1,1,0},
+            {0,1,1,0,0,1,0,0,0,0,1,0},
         };
-
-
-    public static List<Rectangle> LevelDesign(List<Rectangle> door, List<Rectangle> key)
+    public static List<Rectangle> LevelDesign(List<Rectangle> door, List<Rectangle> key, bool rnd = true)
     {
 
         List<Rectangle> map = new List<Rectangle>();
@@ -30,28 +27,31 @@ public class Levels
         int size = 84;
         int sizeCoin = 30;
 
-        Random generator = new Random();
-        int random = generator.Next(3, 6);
+        if (rnd)
+        {
+            Random generator = new Random();
+            int random = generator.Next(3, 6);
 
-        if (level[0, 0] == 0)
-        {
-            if (random == 3)
+            if (level[0, 0] == 0)
             {
-                level[0, 0] = 3;
+                if (random == 3)
+                {
+                    level[0, 0] = 3;
+                }
             }
-        }
-        if (level[11, 9] == 0)
-        {
-            if (random == 4)
+            if (level[11, 9] == 0)
             {
-                level[11, 9] = 3;
+                if (random == 4)
+                {
+                    level[11, 9] = 3;
+                }
             }
-        }
-        if (level[6, 5] == 0)
-        {
-            if (random == 5)
+            if (level[6, 5] == 0)
             {
-                level[6, 5] = 3;
+                if (random == 5)
+                {
+                    level[6, 5] = 3;
+                }
             }
         }
 
@@ -73,9 +73,7 @@ public class Levels
                     key.Add(new Rectangle(x * size + 25, y * size + 25, sizeCoin, sizeCoin));
                 }
             }
-
         }
-
         return map;
     }
 
@@ -85,6 +83,7 @@ public class Levels
         {
             Raylib.DrawText("Door key: 1", Raylib.GetScreenWidth() - 120, 20, 20, Color.WHITE);
             level[8, 11] = 0;
+            level[6, 11] = 2;
         }
         return level;
     }
