@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Raylib_cs;
 using System.Numerics;
 
-
+//Variablar för spelet
 float speed = 4.3f;
 bool alive = false;
 bool keyTaken = false;
@@ -33,6 +33,7 @@ List<Rectangle> map = Levels.LevelDesign(door, key);
 
 while (!Raylib.WindowShouldClose())
 {
+    //StartScreen
     if (!alive)
     {
         Raylib.BeginDrawing();
@@ -52,6 +53,7 @@ while (!Raylib.WindowShouldClose())
             if (mX >= 420 & mX <= 545 & mY >= 498 & mY <= 528) alive = true;
         }
     }
+    //Spelet
     else
     {
 
@@ -64,6 +66,7 @@ while (!Raylib.WindowShouldClose())
 
         Raylib.EndDrawing();
 
+        //If statement på vad som ska hända i dem två rummen (man ska ha samma movement samt collision)
         if (room == "start" || room == "hallway")
         {
             playerRect = Collision.PlayerCollision(playerRect);
@@ -73,8 +76,13 @@ while (!Raylib.WindowShouldClose())
             playerRect.x += playerMovement.X;
 
         }
+
+        //IF statement vad som ska häna i room "start"
         if (room == "start")
         {
+            //Foreach loop som jag använder genom att ta in en lista som innehåller en position samt storlek som finns i metoden "Levels"
+            //Jag tar in key listan där jag sätter en textur på den med texture2D och bestämmer positionen på den
+            //genom att använda keyRect.x och y
             foreach (Rectangle keyRect in key)
             {
                 if (Raylib.CheckCollisionRecs(playerRect, keyRect) && keyTaken == false) keyTaken = true;
@@ -89,6 +97,8 @@ while (!Raylib.WindowShouldClose())
                 if (Raylib.CheckCollisionRecs(playerRect, doorRect)) room = "hallway";
 
             }
+            //Det är samma sak för denna foreach loop med jag tar in mapen alltså där hindren ska vara
+            //Checkar colliisonen mellan playerRect och boxen genom checkcollisionrecs och sedan tar man -hp om man går in i väggen
             foreach (Rectangle box in map)
             {
                 Raylib.DrawTexture(wallTexture, (int)box.x, (int)box.y, Color.WHITE);
@@ -120,13 +130,17 @@ while (!Raylib.WindowShouldClose())
     }
 }
 
+//Playermovement metod
 static Vector2 PlayerMovement(float speed)
 {
+    //Skapar en vector för playermovement som jag kallar movement
     Vector2 movement = new Vector2();
+    //När man trycker på W,A,S eller D så kommer karaktären att flyttas med speed (4.3 per frame)
     if (Raylib.IsKeyDown(KeyboardKey.KEY_W)) movement.Y = -speed;
     if (Raylib.IsKeyDown(KeyboardKey.KEY_S)) movement.Y = +speed;
     if (Raylib.IsKeyDown(KeyboardKey.KEY_D)) movement.X += speed;
     if (Raylib.IsKeyDown(KeyboardKey.KEY_A)) movement.X -= speed;
 
+    //Returnerar movement
     return movement;
 }

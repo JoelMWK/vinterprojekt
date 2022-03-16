@@ -7,6 +7,10 @@ public class Collision
 {
     public static Rectangle PlayerCollision(Rectangle playerRect)
     {
+        //Denna metod kontrollerar playercollision mellan väggarna (väggarna på skärmen inte hindren)
+        //If statment som säger att om playerrect.x + width på den är längre än screenwidth då ska karaktären
+        //Åka tillbaka med sw-playerwitdh (det kommer se ut som man bara stannar vid väggen)
+        //Samma princip för screen height
         int sw = Raylib.GetScreenWidth();
         int sh = Raylib.GetScreenHeight();
 
